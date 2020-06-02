@@ -1,0 +1,151 @@
+version:  '3'
+services:
+
+  dashboard:
+    container_name: dashboard
+    image: ai-workspace-dashboard:latest
+    build: ./tools/dashboard
+    environment:
+      HOST_LAB: localhost:8888/lab
+      HOST_MLFLOW: localhost:5000
+      HOST_MINIO: localhost:9000
+      HOST_TENSORBOARD: localhost:6006
+      HOST_DATABASE: localhost:8890
+    ports:
+      - 8080:80
+    networks:
+      - ai_workspace
+      
+  jupyterlab:
+     container_name: jupyterlab
+     build: ./tools/jupyter
+     image: ai-workspace-jupyterlab:latest 
+     environment:
+       MYSQL_USER: ${MYSQL_USER}
+       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+       AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+       AWS_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
+       MLFLOW_S3_ENDPOINT_URL: http://${S3_ENDPOINT_URL}
+       MLFLOW_TRACKING_URI: http://mlflow:5000
+     volumes: 
+       - ${WORKSPACE_DIR}:/home/jovyan/work
+       - working_dir:/home/jovyan/
+       - ./tools/jupyter/jupyter_notebook_config.py:/home/jovyan/.jupyter/jupyter_notebook_config.py
+     ports:
+       - 8888:8888
+     working_dir: /home/jovyan/work
+     command: "start.sh jupyter lab --NotebookApp.token=''"
+     depends_on:
+       - mysql
+       - minio_mlflow_bucket
+     networks:
+       - ai_workspace
+
+  mlflow:
+    container_name: mlflow
+    build: ./tools/mlflow
+    image: ai-workspace-mlflow:latest
+    depends_on:
+      - mysql 
+      - minio_mlflow_bucket
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
+      MLFLOW_S3_ENDPOINT_URL: http://${S3_ENDPOINT_URL}
+      MLFLOW_EXTRA_OPS: " --backend-store-uri mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:3306/mlflow --default-artifact-root s3://mlflow/"
+    ports:
+      - 5000:5000
+    networks:
+      - ai_workspace
+
+  minio:
+    container_name: aiw-minio
+    image: minio/minio:RELEASE.2019-08-01T22-18-54Z
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ACCESS_KEY: ${S3_ACCESS_KEY_ID}
+      MINIO_SECRET_KEY: ${S3_SECRET_ACCESS_KEY}
+    command: minio server /data
+    networks:
+      - ai_workspace
+
+  minio_mlflow_bucket:
+    container_name: create_bucket
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5s;
+      /usr/bin/mc config host add myminio http://${S3_ENDPOINT_URL} ${S3_ACCESS_KEY_ID} ${S3_SECRET_ACCESS_KEY}; 
+      /usr/bin/mc mb myminio/mlflow; 
+      /usr/bin/mc mb myminio/tensorflow;
+      exit 0;"
+    networks:
+      - ai_workspace
+
+  mysql:
+    container_name: mysql
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD} 
+    ports:
+      - 3306:3306
+    volumes:
+      - mysql_db:/var/lib/mysql
+      - ./tools/mysql:/docker-entrypoint-initdb.d
+    networks:
+      - ai_workspace
+    healthcheck:
+      test: ["CMD", "mysql" ,"-u root -p PASSWORD" ,"-e", "SHOW DATABASES LIKE 'mlflow'"]
+      timeout: 20s
+      retries: 10
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: ai-workspace-phpmyadmin:latest
+    build: ./tools/phpmyadmin
+    depends_on:
+      - mysql
+    restart: always
+    environment: 
+      PMA_HOST: mysql
+    ports:
+      - 8890:80
+    networks:
+      - ai_workspace
+         
+  tensorboard:
+    container_name: tensorboard
+    image: tensorflow/tensorflow
+    restart: always
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY}
+      S3_ENDPOINT: ${S3_ENDPOINT_URL}
+      S3_VERIFY_SSL: '0'
+      S3_USE_HTTPS: '0' 
+      S3_REGION: 'us-east-1' 
+    ports:
+      - 6006:6006
+    # volumes:
+    #- ${WORKSPACE_DIR}/logs:/tf_logs 
+    command: "tensorboard --logdir s3://tensorflow/logs/"
+    networks:
+      - ai_workspace
+         
+networks:
+  ai_workspace:
+
+volumes:
+  mysql_db:
+  working_dir:
+  minio_data:

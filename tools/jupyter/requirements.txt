@@ -1,0 +1,6 @@
+mlflow
+minio
+boto3
+mysql-connector
+tensorflow==1.14.0
+numpy==1.16.4

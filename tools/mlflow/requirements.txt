@@ -1,0 +1,5 @@
+mlflow
+awscli
+mysqlclient
+mysql-connector
+boto3

@@ -1,0 +1,7 @@
+.vscode/
+.ipynb_checkpoints
+workspace/logs
+workspace/outputs
+
+jupyterhub.sqlite
+jupyterhub_cookie_secret

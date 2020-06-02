@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: createbuckets
+spec:
+  template:
+    spec:
+      containers:
+      - name: createbuckets
+        image: minio/mc
+        env:
+          - name: S3_ENDPOINT_URL
+            value: "aiw-minio.ai-workspace:9000"
+          - name: S3_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aiw-minio
+                key: accesskey
+          - name: S3_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aiw-minio
+                key: secretkey
+        command: ["/bin/sh"]
+        args: ["-c", "sleep 5s;
+            /usr/bin/mc config host add myminio http://$S3_ENDPOINT_URL $S3_ACCESS_KEY_ID $S3_SECRET_ACCESS_KEY; 
+            /usr/bin/mc mb myminio/mlflow; 
+            /usr/bin/mc mb myminio/tensorflow;
+            exit 0;"]
+        readinessProbe: 
+          exec:
+            command:
+            - sh
+            - -c
+            - >-
+              curl --silent http://aiw-minio.ai-workspace:9000/health/live |
+              grep --quiet -e '^{\"status\"\:\"UP\".*}$' 
+          initialDelaySeconds: 15
+          timeoutSeconds: 1
+      restartPolicy: Never
+  backoffLimit: 1
