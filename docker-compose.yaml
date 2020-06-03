@@ -11,6 +11,7 @@ services:
       HOST_MINIO: localhost:9000
       HOST_TENSORBOARD: localhost:6006
       HOST_DATABASE: localhost:8890
+      HOST_AIRFLOW: localhost:8070
     ports:
       - 8080:80
     networks:
@@ -101,23 +102,27 @@ services:
       - 3306:3306
     volumes:
       - mysql_db:/var/lib/mysql
-      - ./tools/mysql:/docker-entrypoint-initdb.d
+      - ./tools/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./tools/mysql/my.cnf:/etc/mysql/my.cnf
     networks:
       - ai_workspace
     healthcheck:
-      test: ["CMD", "mysql" ,"-u root -p PASSWORD" ,"-e", "SHOW DATABASES LIKE 'mlflow'"]
-      timeout: 20s
-      retries: 10
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 20s
+        retries: 10
 
   phpmyadmin:
     container_name: phpmyadmin
-    image: ai-workspace-phpmyadmin:latest
-    build: ./tools/phpmyadmin
+    image: phpmyadmin/phpmyadmin
     depends_on:
       - mysql
     restart: always
     environment: 
       PMA_HOST: mysql
+      PMA_USERNAME: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./tools/phpmyadmin/config.inc.php:/etc/phpmyadmin/config.user.inc.php
     ports:
       - 8890:80
     networks:
@@ -141,7 +146,48 @@ services:
     command: "tensorboard --logdir s3://tensorflow/logs/"
     networks:
       - ai_workspace
-         
+   
+  airflow_initdb:
+    container_name: airflow-initdb
+    image: apache/airflow
+    environment: 
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:3306/airflow"
+      DB_BACKEND: "mysql"
+      DB_HOST: "mysql"
+    command: "initdb"
+    networks:
+      - ai_workspace
+      
+  airflow_webserver:
+    container_name: airflow-webserver
+    image: apache/airflow
+    restart: always
+    environment: 
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:3306/airflow"
+      DB_BACKEND: "mysql"
+      DB_HOST: "mysql"
+    command: "webserver"
+    ports:
+      - 8070:8080 
+    volumes:
+        - ./workspace/airflow/dags:/opt/airflow/dags
+    networks:
+      - ai_workspace
+
+  airflow_scheduler:
+    container_name: airflow-scheduler
+    image: apache/airflow
+    restart: always
+    environment:
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:3306/airflow"
+      DB_BACKEND: "mysql"
+      DB_HOST: "mysql"
+    command: "scheduler"
+    volumes:
+        - ./workspace/airflow/dags:/opt/airflow/dags
+    networks:
+      - ai_workspace
+
 networks:
   ai_workspace:
 

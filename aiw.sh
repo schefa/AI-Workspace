@@ -21,15 +21,15 @@ if [ "${args[0]}" = "up" ]; then
         sleep 30s;
     fi
 
-   # echo "Removing helpers container"
-   # docker rm create_bucket
- 
     echo " " 
     echo " Dashboard    : http://${HOST}:8080 "
     echo " " 
     echo " MySQL:   mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/mlflow"
     echo " S3:      http://${S3_ENDPOINT_URL} ${S3_ACCESS_KEY_ID} ${S3_SECRET_ACCESS_KEY}"
 
+    #echo "Removing helpers container"
+    #docker rm $(docker ps -q -f status=exited)
+ 
 elif [ "${args[0]}" = "restart" ]; then
     docker-compose restart
 elif [ "${args[0]}" = "stop" ]; then
@@ -42,7 +42,6 @@ elif [ "${args[0]}" = "build" ]; then
     docker build ./tools/dashboard -t ai-workspace-dashboard;
     docker build ./tools/jupyter -t ai-workspace-jupyterlab;
     docker build ./tools/mlflow -t ai-workspace-mlflow;
-    docker build ./tools/phpmyadmin -t ai-workspace-phpmyadmin;
 elif [ "${args[0]}" = "kube" ]; then
     if [ "${args[1]}" = "init" ]; then
         if [ "${args[2]}" = "ingress" ]; then
@@ -66,7 +65,7 @@ elif [ "${args[0]}" = "kube" ]; then
             echo "      kube init set ai-workspace  - " 
         fi;
     elif [ "${args[1]}" = "install" ]; then
-        helm install --set accessKey=${S3_ACCESS_KEY_ID},secretKey=${S3_SECRET_ACCESS_KEY},service.type=NodePort aiw-minio stable/minio;
+        helm install aiw-minio stable/minio --set accessKey=${S3_ACCESS_KEY_ID},secretKey=${S3_SECRET_ACCESS_KEY},service.type=NodePort;
         helm install aiw-phpmyadmin bitnami/phpmyadmin --set db.host=aiw-mysql,service.type=NodePort;
         helm install aiw-mysql stable/mysql --set mysqlRootPassword=${MYSQL_PASSWORD},mysqlAllowEmptyPassword=false,mysqlPassword=${MYSQL_PASSWORD},mysqlUser=${MYSQL_USER};
         helm install aiw-mlflow kubernetes/charts/mlflow/;
@@ -74,10 +73,10 @@ elif [ "${args[0]}" = "kube" ]; then
         kubectl apply -f kubernetes/templates/ingress.yaml;
     elif [ "${args[1]}" = "uninstall" ]; then 
         helm uninstall aiw-minio;
+        helm uninstall aiw-phpmyadmin;
         helm uninstall aiw-mysql;
         helm uninstall aiw-mlflow;
         helm uninstall aiw-dashboard;
-        helm uninstall aiw-phpmyadmin;
         kubectl delete -f kubernetes/templates/ingress.yaml;
     else
         echo " "

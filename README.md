@@ -11,7 +11,14 @@ AI workspace is a dev development environment for professional machine learning 
 - prepare your AI project for a Cloud infrastructure
 All services run in Docker containers. 
 
-## Shortcut *aiw*
+### Prerequisites
+
+- Docker
+- Docker Compose 
+- Kubernetes 
+- Helm
+
+### Shortcut *aiw*
 
 The AI workspace is handled over the bash script "./aiw.sh". In order to create a shortcut to this command, we need an alias
 
@@ -80,6 +87,7 @@ Make sure that the ports are not taken.<br>
 |**Dashboard**|http://localhost:8080 |http://localhost |AI Workspace Landing Page|
 |**[JupyterLab](https://github.com/jupyterlab/jupyterlab)**|http://localhost:8888 |http://localhost/lab|Browser-based development environment|
 |**[MLFlow](https://github.com/mlflow/mlflow)**|http://localhost:5000 |http://localhost/mlflow|Machine Learning Lifecycle Platform for tracking experiments and runs, evaluating models, parameters and metrics|
+|**[Airflow](https://github.com/apache/airflow)**|http://localhost:8070 |http://localhost/airflow|A platform to programmatically author, schedule, and monitor workflows|
 |**[Tensorboard](https://github.com/tensorflow/tensorboard)**|http://localhost:6006 |http://localhost/tensorboard|TensorFlow's Visualization Toolkit|
 |**[MinIO](https://github.com/minio/minio)**|http://localhost:9000 |http://localhost/minio|S3 object storage in order to store artifacts from MLFlow or training data|
 |**[MySQL](https://github.com/mysql/mysql-server)**|http://localhost:3306 ||Relational database|
