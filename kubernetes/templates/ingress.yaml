@@ -18,6 +18,10 @@ spec:
         backend:
           serviceName: aiw-minio
           servicePort: 9000
+      - path: /airflow
+        backend:
+          serviceName: aiw-airflow-web
+          servicePort: 8080
       - path: /mlflow
         backend:
           serviceName: aiw-mlflow

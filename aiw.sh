@@ -43,7 +43,7 @@ elif [ "${args[0]}" = "build" ]; then
     docker build ./tools/jupyter -t ai-workspace-jupyterlab;
     docker build ./tools/mlflow -t ai-workspace-mlflow;
 elif [ "${args[0]}" = "kube" ]; then
-    if [ "${args[1]}" = "init" ]; then
+    if [ "${args[1]}" = "ns" ]; then
         if [ "${args[2]}" = "ingress" ]; then
             ns=`kubectl get namespace nginx-ingress --no-headers --output=go-template={{.metadata.name}} 2>/dev/null`
             if [ -z "${ns}" ]; then
@@ -54,36 +54,27 @@ elif [ "${args[0]}" = "kube" ]; then
                 echo "Namespace 'nginx-ingress' already exists"
             fi
         elif [ "${#args[@]}" = 3 ]; then
-            kubectl create namespace ai-workspace;
-            kubectl config set-context --current --namespace=ai-workspace;
-            helm repo add stable https://kubernetes-charts.storage.googleapis.com;
-            helm repo add bitnami https://charts.bitnami.com/bitnami;
+            kubectl create namespace ${args[2]};
+            kubectl config set-context --current --namespace=${args[2]};
         else
             echo " Provide a namespace"
             echo " "
-            echo "      kube init set ingress       - Creates nginx ingress controller in separate namespace" 
-            echo "      kube init set ai-workspace  - " 
+            echo "      aiw kube ns ingress       - Creates nginx ingress controller in separate namespace" 
+            echo "      aiw kube ns ai-workspace  - Creates or initializes an AI Workspace 'ai-workspace'"
         fi;
     elif [ "${args[1]}" = "install" ]; then
-        helm install aiw-minio stable/minio --set accessKey=${S3_ACCESS_KEY_ID},secretKey=${S3_SECRET_ACCESS_KEY},service.type=NodePort;
-        helm install aiw-phpmyadmin bitnami/phpmyadmin --set db.host=aiw-mysql,service.type=NodePort;
-        helm install aiw-mysql stable/mysql --set mysqlRootPassword=${MYSQL_PASSWORD},mysqlAllowEmptyPassword=false,mysqlPassword=${MYSQL_PASSWORD},mysqlUser=${MYSQL_USER};
-        helm install aiw-mlflow kubernetes/charts/mlflow/;
-        helm install aiw-dashboard kubernetes/charts/dashboard/;
-        kubectl apply -f kubernetes/templates/ingress.yaml;
-    elif [ "${args[1]}" = "uninstall" ]; then 
-        helm uninstall aiw-minio;
-        helm uninstall aiw-phpmyadmin;
-        helm uninstall aiw-mysql;
-        helm uninstall aiw-mlflow;
-        helm uninstall aiw-dashboard;
-        kubectl delete -f kubernetes/templates/ingress.yaml;
+        helm repo add stable https://kubernetes-charts.storage.googleapis.com;
+        helm repo add bitnami https://charts.bitnami.com/bitnami;
+        helm dependency build kubernetes/;
+        helm install ai-workspace kubernetes/;
+    elif [ "${args[1]}" = "uninstall" ]; then
+        helm uninstall ai-workspace;
     else
         echo " "
         echo "AI Workspace on Kubernetes"
         echo " "
         echo " Options:"
-        echo "      init        -- Creates and sets namespace" 
+        echo "      ns          -- Creates and sets namespace" 
         echo "      install     -- Helm install" 
         echo "      uninstall   -- Helm uninstall" 
     fi;

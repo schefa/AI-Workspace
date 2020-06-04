@@ -33,7 +33,7 @@ spec:
             - sh
             - -c
             - >-
-              curl --silent http://aiw-minio.ai-workspace:9000/health/live |
+              curl --silent http://ai-workspace-minio.ai-workspace:9000/health/live |
               grep --quiet -e '^{\"status\"\:\"UP\".*}$' 
           initialDelaySeconds: 15
           timeoutSeconds: 1

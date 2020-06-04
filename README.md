@@ -38,7 +38,7 @@ aiw build
 
 Environment variables can be setted in ``.env``.<br>
  
-There are two options to use the AI Workspace: locally with Docker Compose or a Kubernetes Cluster.
+There are two options to use the AI Workspace: locally with Docker Compose or on a Kubernetes Cluster.
 
 ### 2.1. Docker Compose
 

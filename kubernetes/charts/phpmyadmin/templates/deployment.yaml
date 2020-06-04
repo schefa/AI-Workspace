@@ -31,48 +31,40 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }} 
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: MYSQL_HOST
+            - name: PMA_HOST
               valueFrom:
                 secretKeyRef:
                   name: aiw-secret
                   key: dbhost
-            - name: MYSQL_USER
+            - name: PMA_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: aiw-secret
                   key: dbuser
-            - name: MYSQL_PASSWORD
+            - name: PMA_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: aiw-secret
                   key: dbpassword
-            - name: S3_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: aiw-secret
-                  key: aws_access_key_id
-            - name: S3_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: aiw-secret
-                  key: aws_secret_access_key
-            - name: S3_ENDPOINT_URL
-              valueFrom:
-                secretKeyRef:
-                  name: aiw-secret
-                  key: mlflow_s3_endpoint_url
-            - name: MLFLOW_EXTRA_OPS
-              value: " --backend-store-uri mysql://{{ .Values.global.secret.dbuser }}:{{ .Values.global.secret.dbpassword }}@{{ .Values.global.secret.dbhost }}:3306/mlflow --default-artifact-root s3://mlflow/"
           ports:
             - name: http
-              containerPort: 5000
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/phpmyadmin/
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      
+      volumes:
+      - name: config-volume
+        configMap:
+          name: aiw-phpmyadmin-configmap
+          items:
+          - key: config.inc.php
+            path: config.user.inc.php
