@@ -31,44 +31,25 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }} 
-          env:
-            {{- if .Values.jupyterlab.enabled }}
-            - name: HOST_LAB
-              value: localhost/lab
-            {{- end }}
-            {{- if .Values.theia.enabled }}
-            - name: HOST_THEIA
-              value: localhost/ide
-            {{- end }}
-            {{- if .Values.mlflow.enabled }}
-            - name: HOST_MLFLOW
-              value: localhost/mlflow
-            {{- end }}
-            {{- if .Values.minio.enabled }}
-            - name: HOST_MINIO
-              value: localhost/minio
-            {{- end }}
-            {{- if .Values.tensorboard.enabled }}
-            - name: HOST_TENSORBOARD
-              value: localhost/tensorboard
-            {{- end }}
-            {{- if .Values.phpmyadmin.enabled }}
-            - name: HOST_DATABASE
-              value: localhost/phpmyadmin
-            {{- end }}
-            {{- if .Values.airflow.enabled }}
-            - name: HOST_AIRFLOW
-              value: localhost/airflow
-            {{- end }} 
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /home/project
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      
+      volumes: 
+      - name: data
+      {{- if .Values.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ template "fullname" . }}
+      {{- else }}
+        emptyDir: {}
+      {{- end -}}

@@ -1,4 +1,4 @@
-# Default values for helm-chart.
+# Default values for AI Workspace
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -41,7 +41,7 @@ minio:
         type: NodePort
 
 airflow:
-    enabled: true
+    enabled: false
     postgresql:
         enabled: false
     externalDatabase:
@@ -52,3 +52,6 @@ airflow:
         passwordSecretKey: dbpassword
     redis:
         enabled: false
+
+theia:
+    enabled: true

@@ -69,13 +69,16 @@ aiw purge
 
 ```bash
 # Create ingress controller
-aiw kube init ingress
+aiw kube ns ingress
 
 # Init or set a Kubernetes namespace
-aiw kube init ai-workspace
+aiw kube ns ai-workspace
 
 # Starts all services
 aiw kube install
+
+# Remove all services
+aiw kube uninstall
 ```
 
 ## Components 
@@ -86,6 +89,7 @@ Make sure that the ports are not taken.<br>
 |-|-|-|-|
 |**Dashboard**|http://localhost:8080 |http://localhost |AI Workspace Landing Page|
 |**[JupyterLab](https://github.com/jupyterlab/jupyterlab)**|http://localhost:8888 |http://localhost/lab|Browser-based development environment|
+|**[Theia](https://github.com/theia-ide/theia-apps)**||http://localhost/ide|Browser-based development environment|
 |**[MLFlow](https://github.com/mlflow/mlflow)**|http://localhost:5000 |http://localhost/mlflow|Machine Learning Lifecycle Platform for tracking experiments and runs, evaluating models, parameters and metrics|
 |**[Airflow](https://github.com/apache/airflow)**|http://localhost:8070 |http://localhost/airflow|A platform to programmatically author, schedule, and monitor workflows|
 |**[Tensorboard](https://github.com/tensorflow/tensorboard)**|http://localhost:6006 |http://localhost/tensorboard|TensorFlow's Visualization Toolkit|
