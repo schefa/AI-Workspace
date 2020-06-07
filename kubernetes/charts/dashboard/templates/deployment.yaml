@@ -33,31 +33,31 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }} 
           env:
-            {{- if .Values.jupyterlab.enabled }}
+            {{- if .Values.global.jupyterhub.enabled }}
             - name: HOST_LAB
               value: localhost/lab
             {{- end }}
-            {{- if .Values.theia.enabled }}
+            {{- if .Values.global.theia.enabled }}
             - name: HOST_THEIA
               value: localhost/ide
             {{- end }}
-            {{- if .Values.mlflow.enabled }}
+            {{- if .Values.global.mlflow.enabled }}
             - name: HOST_MLFLOW
               value: localhost/mlflow
             {{- end }}
-            {{- if .Values.minio.enabled }}
+            {{- if .Values.global.minio.enabled }}
             - name: HOST_MINIO
               value: localhost/minio
             {{- end }}
-            {{- if .Values.tensorboard.enabled }}
+            {{- if .Values.global.tensorboard.enabled }}
             - name: HOST_TENSORBOARD
               value: localhost/tensorboard
             {{- end }}
-            {{- if .Values.phpmyadmin.enabled }}
+            {{- if .Values.global.phpmyadmin.enabled }}
             - name: HOST_DATABASE
               value: localhost/phpmyadmin
             {{- end }}
-            {{- if .Values.airflow.enabled }}
+            {{- if .Values.global.airflow.enabled }}
             - name: HOST_AIRFLOW
               value: localhost/airflow
             {{- end }} 

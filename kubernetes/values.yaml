@@ -10,38 +10,56 @@ global:
         aws_access_key_id: minio
         aws_secret_access_key: minio123
         mlflow_s3_endpoint_url: http://ai-workspace-minio:9000 
+    dashboard:
+        enabled: true
+    jupyterhub:
+        enabled: true
+    mlflow:
+        enabled: false
+    phpmyadmin:
+        enabled: false
+    mysql:
+        enabled: true
+    minio:
+        enabled: false
+    airflow:
+        enabled: false 
+    theia:
+        enabled: false
+    tensorboard:
+        enabled: false
 
-dashboard:
-    enabled: true
+jupyterhub: 
+    proxy:
+        secretToken: "bcd448e284d1a2acdb85a14844a1829a2d9703c3606362b0a72cd6d28441816c"
+    hub:
+        service:
+            type: NodePort
+        db:
+            type: mysql
+            url: mysql+pymysql://root:PASSWORD@ai-workspace-mysql:3306/jupyterhub
 
-mlflow:
-    enabled: true
-
-phpmyadmin:
-    enabled: true
-
-mysql:
-    enabled: true
+mysql: 
     mysqlRootPassword: PASSWORD
     mysqlAllowEmptyPassword: false
     initializationFiles:
         init.sql: |-
             CREATE DATABASE IF NOT EXISTS mlflow;
+            CREATE DATABASE IF NOT EXISTS airflow;
+            CREATE DATABASE IF NOT EXISTS jupyterhub;
     configurationFilesPath: /etc/mysql/
     configurationFiles:
         my.cnf: |-
             [mysqld]
             explicit_defaults_for_timestamp = 1
 
-minio:
-    enabled: true
+minio: 
     accessKey: minio
     secretKey: minio123
     service:
         type: NodePort
 
-airflow:
-    enabled: false
+airflow: 
     postgresql:
         enabled: false
     externalDatabase:
@@ -52,6 +70,3 @@ airflow:
         passwordSecretKey: dbpassword
     redis:
         enabled: false
-
-theia:
-    enabled: true

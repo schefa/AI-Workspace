@@ -56,6 +56,10 @@ elif [ "${args[0]}" = "kube" ]; then
         elif [ "${#args[@]}" = 3 ]; then
             kubectl create namespace ${args[2]};
             kubectl config set-context --current --namespace=${args[2]};
+            helm repo add stable https://kubernetes-charts.storage.googleapis.com;
+            helm repo add bitnami https://charts.bitnami.com/bitnami;
+            helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+            helm dependency build kubernetes/;
         else
             echo " Provide a namespace"
             echo " "
@@ -63,9 +67,6 @@ elif [ "${args[0]}" = "kube" ]; then
             echo "      aiw kube ns ai-workspace  - Creates or initializes an AI Workspace 'ai-workspace'"
         fi;
     elif [ "${args[1]}" = "install" ]; then
-        helm repo add stable https://kubernetes-charts.storage.googleapis.com;
-        helm repo add bitnami https://charts.bitnami.com/bitnami;
-        helm dependency build kubernetes/;
         helm install ai-workspace kubernetes/;
     elif [ "${args[1]}" = "uninstall" ]; then
         helm uninstall ai-workspace;

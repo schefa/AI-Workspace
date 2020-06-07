@@ -81,6 +81,31 @@ aiw kube install
 aiw kube uninstall
 ```
 
+#### Configuration
+
+`kubernetes/values.yaml`
+
+```
+dashboard:
+    enabled: true
+jupyterhub:
+    enabled: true
+mlflow:
+    enabled: true
+phpmyadmin:
+    enabled: true
+mysql:
+    enabled: true
+minio:
+    enabled: true
+airflow:
+    enabled: true
+theia:
+    enabled: true
+tensorboard:
+    enabled: true
+```
+
 ## Components 
 Make sure that the ports are not taken.<br>
 
@@ -88,7 +113,7 @@ Make sure that the ports are not taken.<br>
 |Service|Docker Compose|Kubernetes|Function|
 |-|-|-|-|
 |**Dashboard**|http://localhost:8080 |http://localhost |AI Workspace Landing Page|
-|**[JupyterLab](https://github.com/jupyterlab/jupyterlab)**|http://localhost:8888 |http://localhost/lab|Browser-based development environment|
+|**[JupyterLab/Hub](https://github.com/jupyterlab/jupyterlab)**|http://localhost:8888 |http://localhost/hub|Browser-based development environment|
 |**[Theia](https://github.com/theia-ide/theia-apps)**||http://localhost/ide|Browser-based development environment|
 |**[MLFlow](https://github.com/mlflow/mlflow)**|http://localhost:5000 |http://localhost/mlflow|Machine Learning Lifecycle Platform for tracking experiments and runs, evaluating models, parameters and metrics|
 |**[Airflow](https://github.com/apache/airflow)**|http://localhost:8070 |http://localhost/airflow|A platform to programmatically author, schedule, and monitor workflows|

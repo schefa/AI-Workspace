@@ -7,23 +7,34 @@ appVersion: 1.0.0
 
 dependencies:
   - name: dashboard
-    condition: dashboard.enabled
+    version: 0.1.0
+    condition: global.dashboard.enabled
   - name: mlflow
-    condition: mlflow.enabled
+    version: 0.1.0
+    condition: global.mlflow.enabled
+  - name: theia
+    version: 0.1.0
+    condition: global.theia.enabled
   - name: phpmyadmin
-    condition: phpmyadmin.enabled
+    version: 0.1.0
+    condition: global.phpmyadmin.enabled
+  - name: jupyterhub
+    version: 0.9.0
+    repository: "@jupyterhub"
+    condition: global.jupyterhub.enabled
+    alias: jupyterhub
   - name: mysql
     version: 1.4.0
     repository: "@stable"
-    condition: mysql.enabled
+    condition: global.mysql.enabled
     alias: mysql
   - name: minio
     version: 5.0.26
     repository: "@stable"
-    condition: minio.enabled
+    condition: global.minio.enabled
     alias: minio
   - name: airflow
     version: 7.1.3
     repository: "@stable"
-    condition: airflow.enabled
+    condition: global.airflow.enabled
     alias: airflow

@@ -10,43 +10,49 @@ spec:
   rules:
   - http:
       paths:
-      {{- if .Values.dashboard.enabled }}
+      {{- if .Values.global.dashboard.enabled }}
       - path: /home
         backend:
           serviceName: ai-workspace-dashboard
           servicePort: 80
       {{- end }}
-      {{- if .Values.theia.enabled }}
+      {{- if .Values.global.theia.enabled }}
       - path: /ide
         backend:
           serviceName: ai-workspace-theia
           servicePort: 3000
       {{- end }}
-      {{- if .Values.minio.enabled }}
+      {{- if .Values.global.jupyterhub.enabled }}
+      - path: /hub
+        backend:
+          serviceName: hub
+          servicePort: 8081
+      {{- end }}
+      {{- if .Values.global.minio.enabled }}
       - path: /minio
         backend:
           serviceName: ai-workspace-minio
           servicePort: 9000
       {{- end }}
-      {{- if .Values.airflow.enabled }}
+      {{- if .Values.global.airflow.enabled }}
       - path: /airflow
         backend:
           serviceName: ai-workspace-airflow-web
           servicePort: 8080
       {{- end }}
-      {{- if .Values.mlflow.enabled }}
+      {{- if .Values.global.mlflow.enabled }}
       - path: /mlflow
         backend:
           serviceName: ai-workspace-mlflow
           servicePort: 5000
       {{- end }}
-      {{- if .Values.phpmyadmin.enabled }}
+      {{- if .Values.global.phpmyadmin.enabled }}
       - path: /phpmyadmin
         backend:
           serviceName: ai-workspace-phpmyadmin
           servicePort: 80
       {{- end }}
-      {{- if .Values.tensorboard.enabled }}
+      {{- if .Values.global.tensorboard.enabled }}
       - path: /tensorboard
         backend:
           serviceName: ai-workspace-tensorboard
