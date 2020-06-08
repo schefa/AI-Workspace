@@ -1,26 +1,37 @@
 # AI Workspace
 
+![AI Workspace Dashboard](./tools/dashboard/architecture.fw.png)
+
+## Table of contents
+
+- [1. Description](#1-description)
+- [2. Getting Started](#2-getting-started)
+    - [2.1. Docker Compose](#21-docker-compose)
+    - [2.2. Kubernetes](#22-kubernetes)
+        - [Configuration](#configuration)
+- [3. Components](#3-components)
+- [4. Customize Dev Environment](#4-customize-dev-environment)
+
 ## 1. Description 
 
+Use __AI workspace__ to build productive AI solutions.
+<br><br>
+This repository is a spin-off of a private project, where I use machine learning to predict stock prices and encaspsulate different steps of Model Lifecycle Management in services 
+- data ingestion
+- preprocessing
+- model selection
+- model training with hyperparameter tuning and experiment tracking
+- model deployment
+- model monitoring 
+- scheduled re-training
+ 
+Building professional AI solutions means, that your results are reproducable, auditable and scalable on a Cloud infrastructure. __AI Workspace__ targets these challenges with Open Source tools running as services in Docker or Kubernetes.
+ 
 ![AI Workspace Dashboard](./tools/dashboard/dashboard.png)
-<br>
-AI workspace is a dev development environment for professional machine learning built on Open Source tools. The project targets several objectives:
-- encapsulate services and entities efficiently (data, code, artifacts)
-- historize performance of ML models
-- make results reproducable
-- prepare your AI project for a Cloud infrastructure
-All services run in Docker containers. 
-
-### Prerequisites
-
-- Docker
-- Docker Compose 
-- Kubernetes 
-- Helm
 
 ### Shortcut *aiw*
 
-The AI workspace is handled over the bash script "./aiw.sh". In order to create a shortcut to this command, we need an alias
+__AI workspace__ is used via bash script "./aiw.sh". You can create an alias with the following shortcut
 
 ```bash
 alias aiw="$(pwd)/aiw.sh"
@@ -36,13 +47,13 @@ aiw
 aiw build
 ```
 
-Environment variables can be setted in ``.env``.<br>
  
 There are two options to use the AI Workspace: locally with Docker Compose or on a Kubernetes Cluster.
 
 ### 2.1. Docker Compose
 
-Clone this repository. Then move or copy all your stuff (notebooks, code) to the directory ``workspace/``. This is the starting directory. You can change it in the ``.env`` file.
+Environment variables can be setted in ``.env``.<br>
+Clone this repository. Then move or copy all your stuff (notebooks, code) to the directory ``workspace/``. This is the starting directory, which can be changed in the ``.env`` file.
 
 ```bash
 # Make sure docker-compose is installed and ./aiw.sh is executable
@@ -67,6 +78,8 @@ aiw purge
 
 ### 2.2. Kubernetes
 
+You need a running Kubernetes Cluster and Helm.
+
 ```bash
 # Create ingress controller
 aiw kube ns ingress
@@ -83,7 +96,7 @@ aiw kube uninstall
 
 #### Configuration
 
-`kubernetes/values.yaml`
+You can enable or disable service in the Values file: `kubernetes/values.yaml`
 
 ```
 dashboard:
@@ -106,7 +119,7 @@ tensorboard:
     enabled: true
 ```
 
-## Components 
+## 3. Components 
 Make sure that the ports are not taken.<br>
 
 ---
@@ -122,7 +135,7 @@ Make sure that the ports are not taken.<br>
 |**[MySQL](https://github.com/mysql/mysql-server)**|http://localhost:3306 ||Relational database|
 |**[phpmyadmin](https://github.com/phpmyadmin/phpmyadmin)**|http://localhost:8890 |http://localhost/phpmyadmin|Browser-based database management tool|
 
-## 3. Customize Dev Environment
+## 4. Customize Dev Environment
 
 ```
 |-tools
@@ -135,3 +148,5 @@ When you first start the AI Workspace it builds an image for JupyterLab with pre
 As your project grows and the need for more Python packages, just delete the Docker image ``ai-workspace-jupyterlab``, adjust ``requirements.txt`` and restart the AI Workspace.
 
 Deleting and rebuilding the image does not affect the code and work results which are persistent stored in ``WORKSPACE_DIR``.
+
+ 
