@@ -59,7 +59,7 @@ elif [ "${args[0]}" = "kube" ]; then
             helm repo add stable https://kubernetes-charts.storage.googleapis.com;
             helm repo add bitnami https://charts.bitnami.com/bitnami;
             helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
-            helm dependency build kubernetes/;
+            helm dependency update kubernetes/;
         else
             echo " Provide a namespace"
             echo " "
@@ -91,8 +91,7 @@ else
     echo "      down    -- Stops and removes all containers"
     echo "      purge   -- Removes everything from the AI Workspace"
     echo " "
-    echo "      kube ingress    -- Creates ingress controller"
-    echo "      kube namespace  -- Creates namespace"
+    echo "      kube ns         -- Creates namespace"
     echo "      kube install    -- Installs all components via Helm"
     echo "      kube uninstall  -- Uninstalls everything"
     echo " "

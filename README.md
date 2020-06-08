@@ -19,7 +19,7 @@ Use __AI workspace__ to build productive AI solutions.
 This repository is a spin-off of a private project, where I use machine learning to predict stock prices and encaspsulate different steps of Model Lifecycle Management in services 
 - data ingestion
 - preprocessing
-- model selection
+- model development
 - model training with hyperparameter tuning and experiment tracking
 - model deployment
 - model monitoring 

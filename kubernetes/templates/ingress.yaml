@@ -47,7 +47,7 @@ spec:
           servicePort: 5000
       {{- end }}
       {{- if .Values.global.phpmyadmin.enabled }}
-      - path: /phpmyadmin
+      - path: /db
         backend:
           serviceName: ai-workspace-phpmyadmin
           servicePort: 80

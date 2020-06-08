@@ -15,13 +15,13 @@ spec:
           - name: S3_ACCESS_KEY_ID
             valueFrom:
               secretKeyRef:
-                name: aiw-minio
-                key: accesskey
+                name: aiw-secret
+                key: aws_access_key_id
           - name: S3_SECRET_ACCESS_KEY
             valueFrom:
               secretKeyRef:
-                name: aiw-minio
-                key: secretkey
+                name: aiw-secret
+                key: aws_secret_access_key
         command: ["/bin/sh"]
         args: ["-c", "sleep 5s;
             /usr/bin/mc config host add myminio http://$S3_ENDPOINT_URL $S3_ACCESS_KEY_ID $S3_SECRET_ACCESS_KEY; 

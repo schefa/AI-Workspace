@@ -13,7 +13,7 @@ global:
     dashboard:
         enabled: true
     jupyterhub:
-        enabled: true
+        enabled: false
     mlflow:
         enabled: false
     phpmyadmin:
@@ -28,7 +28,7 @@ global:
         enabled: false
     tensorboard:
         enabled: false
-
+        
 jupyterhub: 
     proxy:
         secretToken: "bcd448e284d1a2acdb85a14844a1829a2d9703c3606362b0a72cd6d28441816c"
